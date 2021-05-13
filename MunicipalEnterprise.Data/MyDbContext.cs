@@ -10,11 +10,6 @@ namespace MunicipalEnterprise.Data
             optionsBuilder.UseSqlServer(@"Server=.;Database=MunicipalEnterprise;Trusted_Connection=True;");
         }
 
-        public MyDbContext()
-        {
-            Database.EnsureCreated();
-        }
-
         public DbSet<User> Users { get; set; }
         public DbSet<House> Houses { get; set; }
         public DbSet<District> Districts { get; set; }

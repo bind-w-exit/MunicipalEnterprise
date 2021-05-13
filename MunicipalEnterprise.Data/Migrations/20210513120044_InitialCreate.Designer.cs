@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MunicipalEnterprise;
+using MunicipalEnterprise.Data;
 
 namespace MunicipalEnterprise.Data.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20210513094527_InitialCreate")]
+    [Migration("20210513120044_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,7 +21,7 @@ namespace MunicipalEnterprise.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.6")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.Complaint", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.Complaint", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +52,7 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.ToTable("Complaints");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.District", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.District", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,7 +67,7 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.ToTable("Districts");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.House", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.House", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,7 +105,7 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.ToTable("Houses");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.Payment", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -136,7 +136,7 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.User", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -172,13 +172,13 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.Complaint", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.Complaint", b =>
                 {
-                    b.HasOne("MunicipalEnterprise.Models.District", "District")
+                    b.HasOne("MunicipalEnterprise.Data.Models.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId");
 
-                    b.HasOne("MunicipalEnterprise.Models.User", "User")
+                    b.HasOne("MunicipalEnterprise.Data.Models.User", "User")
                         .WithMany("Complaints")
                         .HasForeignKey("UserId");
 
@@ -187,22 +187,22 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.House", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.House", b =>
                 {
-                    b.HasOne("MunicipalEnterprise.Models.User", "User")
+                    b.HasOne("MunicipalEnterprise.Data.Models.User", "User")
                         .WithMany("Houses")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.Payment", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.Payment", b =>
                 {
-                    b.HasOne("MunicipalEnterprise.Models.House", "House")
+                    b.HasOne("MunicipalEnterprise.Data.Models.House", "House")
                         .WithMany()
                         .HasForeignKey("HouseId");
 
-                    b.HasOne("MunicipalEnterprise.Models.User", "User")
+                    b.HasOne("MunicipalEnterprise.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
@@ -211,7 +211,7 @@ namespace MunicipalEnterprise.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MunicipalEnterprise.Models.User", b =>
+            modelBuilder.Entity("MunicipalEnterprise.Data.Models.User", b =>
                 {
                     b.Navigation("Complaints");
 
