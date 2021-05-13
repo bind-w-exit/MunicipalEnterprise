@@ -11,7 +11,6 @@ namespace MunicipalEnterprise.Views
         public Complaints()
         {
             InitializeComponent();
-            DataContext = new ComplaintsViewModel();
         }
     }
 }

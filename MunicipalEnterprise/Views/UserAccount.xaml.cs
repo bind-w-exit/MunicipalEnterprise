@@ -11,7 +11,6 @@ namespace MunicipalEnterprise.Views
         public UserAccount()
         {
             InitializeComponent();
-            DataContext = new UserAccountViewModel();
         }
     }
 }

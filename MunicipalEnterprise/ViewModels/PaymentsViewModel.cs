@@ -21,11 +21,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _paymentsList;
             }
 
-            set
-            {
-                _paymentsList = value;
-                OnPropertyChanged(nameof(PaymentsList));
-            }
+            set { SetProperty(ref _paymentsList, value); }
 
         }
 
@@ -37,11 +33,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _selectedPayment;
             }
 
-            set
-            {
-                _selectedPayment = value;
-                OnPropertyChanged(nameof(SelectedPayment));
-            }
+            set { SetProperty(ref _selectedPayment, value); }
         }
 
         private ObservableCollection<House> _housesList;
@@ -52,11 +44,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _housesList;
             }
 
-            set
-            {
-                _housesList = value;
-                OnPropertyChanged(nameof(HousesList));
-            }
+            set { SetProperty(ref _housesList, value); }
 
         }
 
@@ -70,9 +58,8 @@ namespace MunicipalEnterprise.ViewModels
 
             set
             {
-                _selectedHouse = value;
                 OldHeatMeter = Convert.ToString(SelectedHouse?.HeatMeter);
-                OnPropertyChanged(nameof(SelectedHouse));
+                SetProperty(ref _selectedHouse, value);
             }
         }
 
@@ -86,8 +73,7 @@ namespace MunicipalEnterprise.ViewModels
 
             set
             {
-                _cost = value;
-                OnPropertyChanged(nameof(Cost));
+                SetProperty(ref _cost, value);
 
                 ClearErrors(nameof(Cost));
 
@@ -105,11 +91,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _oldHeatMeter;
             }
 
-            set
-            {
-                _oldHeatMeter = value;
-                OnPropertyChanged(nameof(OldHeatMeter));
-            }
+            set { SetProperty(ref _oldHeatMeter, value); }
         }
 
         private string _heatMeter;
@@ -122,8 +104,7 @@ namespace MunicipalEnterprise.ViewModels
 
             set
             {
-                _heatMeter = value;
-                OnPropertyChanged(nameof(HeatMeter));
+                SetProperty(ref _heatMeter, value);
 
                 ClearErrors(nameof(HeatMeter));
 
@@ -164,11 +145,7 @@ namespace MunicipalEnterprise.ViewModels
             {
                 return _isDialogOpen;
             }
-            set
-            {
-                _isDialogOpen = value;
-                OnPropertyChanged(nameof(IsDialogOpen));
-            }
+            set { SetProperty(ref _isDialogOpen, value); }
         }
 
         private object _dialogContent;
@@ -178,11 +155,7 @@ namespace MunicipalEnterprise.ViewModels
             {
                 return _dialogContent;
             }
-            set
-            {
-                _dialogContent = value;
-                OnPropertyChanged(nameof(DialogContent));
-            }
+            set { SetProperty(ref _dialogContent, value); }
         }
 
         private void OpenDialog(object obj)

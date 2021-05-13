@@ -2,7 +2,7 @@
 using MunicipalEnterprise.ViewModels;
 using System.Windows;
 
-namespace MunicipalEnterprise
+namespace MunicipalEnterprise.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -12,7 +12,6 @@ namespace MunicipalEnterprise
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
             MigrationExtension.ApplyMigrations();
             BaseViewModel.MainWindow = this;
         }

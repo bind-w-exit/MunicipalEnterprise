@@ -18,11 +18,7 @@ namespace MunicipalEnterprise.ViewModels
             get { return _login; }
             set
             {
-                if (_login == value)
-                    return;
-
-                _login = value;
-                OnPropertyChanged(nameof(Login));
+                SetProperty(ref _login, value);
 
                 ClearErrors(nameof(Login));
             }
@@ -34,11 +30,7 @@ namespace MunicipalEnterprise.ViewModels
             get { return _password; }
             set
             {
-                if (_password == value)
-                    return;
-
-                _password = value;
-                OnPropertyChanged(nameof(Password));
+                SetProperty(ref _password, value);
 
                 ClearErrors(nameof(Password));
             }

@@ -13,15 +13,7 @@ namespace MunicipalEnterprise.ViewModels
         public Page CurrentPage
         {
             get { return _currentPage; }
-            set
-            {
-                if (_currentPage == value)
-                    return;
-
-                _currentPage = value;
-                OnPropertyChanged("CurrentPage");
-
-            }
+            set { SetProperty(ref _currentPage, value); }
         }
 
         public ICommand BtnClickSignIn

@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
 using System.Linq;
+using MunicipalEnterprise.Views;
+using Prism.Mvvm;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    public class BaseViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    public class BaseViewModel : BindableBase, INotifyDataErrorInfo
+    {        
 
 
         private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
@@ -49,7 +45,7 @@ namespace MunicipalEnterprise.ViewModels
         }
 
         public static MainWindow MainWindow { get; set; }
-        public static Views.User User { get; set; }
+        public static User User { get; set; }
         public static int UserId { get; set; }
     }
 

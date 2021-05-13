@@ -11,8 +11,6 @@ namespace MunicipalEnterprise.Views
         public Houses()
         {
             InitializeComponent();
-            DataContext = new HousesViewModel();
-
         }
     }
 }

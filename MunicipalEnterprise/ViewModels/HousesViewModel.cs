@@ -16,11 +16,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _housesList;
             }
 
-            set
-            {
-                _housesList = value;
-                OnPropertyChanged(nameof(HousesList));
-            }
+            set { SetProperty(ref _housesList, value); }
 
         }
 

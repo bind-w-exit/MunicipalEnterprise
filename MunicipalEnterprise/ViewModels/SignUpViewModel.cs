@@ -30,8 +30,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_firstName == value)
                     return;
 
-                _firstName = value;
-                OnPropertyChanged(nameof(FirstName));
+                SetProperty(ref _firstName, value);
 
                 ClearErrors(nameof(FirstName));
 
@@ -51,8 +50,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_lastName == value)
                     return;
 
-                _lastName = value;
-                OnPropertyChanged(nameof(LastName));
+                SetProperty(ref _lastName, value);
 
                 ClearErrors(nameof(LastName));
 
@@ -72,8 +70,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_middleName == value)
                     return;
 
-                _middleName = value;
-                OnPropertyChanged(nameof(MiddleName));
+                SetProperty(ref _middleName, value);
 
                 ClearErrors(nameof(MiddleName));
 
@@ -93,8 +90,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_dateOfBirth == value)
                     return;
 
-                _dateOfBirth = value;
-                OnPropertyChanged(nameof(DateOfBirth));
+                SetProperty(ref _dateOfBirth, value);
 
                 ClearErrors(nameof(DateOfBirth));
 
@@ -114,8 +110,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_phoneNum == value)
                     return;
 
-                _phoneNum = value;
-                OnPropertyChanged(nameof(PhoneNum));
+                SetProperty(ref _phoneNum, value);
 
                 ClearErrors(nameof(PhoneNum));
 
@@ -146,8 +141,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_email == value)
                     return;
 
-                _email = value;
-                OnPropertyChanged(nameof(Email));
+                SetProperty(ref _email, value);
 
                 ClearErrors(nameof(Email));
 
@@ -175,8 +169,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_login == value)
                     return;
 
-                _login = value;
-                OnPropertyChanged(nameof(Login));
+                SetProperty(ref _login, value);
 
                 ClearErrors(nameof(Login));
             }
@@ -191,8 +184,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_password == value)
                     return;
 
-                _password = value;
-                OnPropertyChanged(nameof(Password));
+                SetProperty(ref _password, value);
 
                 ClearErrors(nameof(Password));
             }
@@ -299,20 +291,16 @@ namespace MunicipalEnterprise.ViewModels
         }
 
         public string HashPassword(string s)
-        {
-            //переводим строку в байт-массим  
+        {        
             byte[] bytes = Encoding.Unicode.GetBytes(s);
 
-            //создаем объект для получения средст шифрования  
             MD5CryptoServiceProvider CSP =
                 new MD5CryptoServiceProvider();
 
-            //вычисляем хеш-представление в байтах  
             byte[] byteHash = CSP.ComputeHash(bytes);
 
             string hash = string.Empty;
 
-            //формируем одну цельную строку из массива  
             foreach (byte b in byteHash)
                 hash += string.Format("{0:x2}", b);
 

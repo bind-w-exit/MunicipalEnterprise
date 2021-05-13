@@ -11,7 +11,6 @@ namespace MunicipalEnterprise.Views
         public Payments()
         {
             InitializeComponent();
-            DataContext = new PaymentsViewModel();
         }
     }
 }

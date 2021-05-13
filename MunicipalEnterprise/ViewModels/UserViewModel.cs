@@ -19,8 +19,7 @@ namespace MunicipalEnterprise.ViewModels
                 if (_currentPage == value)
                     return;
 
-                _currentPage = value;
-                OnPropertyChanged("CurrentPage");
+                SetProperty(ref _currentPage, value);
             }
         }
 

@@ -11,7 +11,6 @@ namespace MunicipalEnterprise.Views
         public User()
         {
             InitializeComponent();
-            DataContext = new UserViewModel();
             BaseViewModel.User = this;
         }
     }

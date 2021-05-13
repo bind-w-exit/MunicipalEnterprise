@@ -20,11 +20,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _complaintsList;
             }
 
-            set
-            {
-                _complaintsList = value;
-                OnPropertyChanged(nameof(ComplaintsList));
-            }
+            set { SetProperty(ref _complaintsList, value); }
 
         }
 
@@ -36,11 +32,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _selectedComplaint;
             }
 
-            set
-            {
-                _selectedComplaint = value;
-                OnPropertyChanged(nameof(SelectedComplaint));
-            }
+            set { SetProperty(ref _selectedComplaint, value); }
         }
 
         private ObservableCollection<District> _districts;
@@ -51,11 +43,7 @@ namespace MunicipalEnterprise.ViewModels
                 return _districts;
             }
 
-            set
-            {
-                _districts = value;
-                OnPropertyChanged(nameof(Districts));
-            }
+            set { SetProperty(ref _districts, value); }
 
         }
 
@@ -69,9 +57,8 @@ namespace MunicipalEnterprise.ViewModels
 
             set
             {
-                _selectedDistrict = value;
+                SetProperty(ref _selectedDistrict, value);
                 ClearErrors(nameof(SelectedDistrict));
-                OnPropertyChanged(nameof(SelectedDistrict));
             }
         }
 
@@ -85,9 +72,8 @@ namespace MunicipalEnterprise.ViewModels
 
             set
             {
-                _briefDescription = value;
+                SetProperty(ref _briefDescription, value);
                 ClearErrors(nameof(BriefDescription));
-                OnPropertyChanged(nameof(BriefDescription));
             }
         }   
 
@@ -130,11 +116,7 @@ namespace MunicipalEnterprise.ViewModels
             {
                 return _isDialogOpen;
             }
-            set
-            {
-                _isDialogOpen = value;
-                OnPropertyChanged(nameof(IsDialogOpen));
-            }
+            set { SetProperty(ref _isDialogOpen, value); }
         }
 
         private bool _isAddDialog;
@@ -144,11 +126,7 @@ namespace MunicipalEnterprise.ViewModels
             {
                 return _isAddDialog;
             }
-            set
-            {
-                _isAddDialog = value;
-                OnPropertyChanged(nameof(IsAddDialog));
-            }
+            set { SetProperty(ref _isAddDialog, value); }
         }
 
         private object _dialogContent;
@@ -158,11 +136,7 @@ namespace MunicipalEnterprise.ViewModels
             {
                 return _dialogContent;
             }
-            set
-            {
-                _dialogContent = value;
-                OnPropertyChanged(nameof(DialogContent));
-            }
+            set { SetProperty(ref _dialogContent, value); }
         }
 
         private string _dialogHeader;
@@ -172,11 +146,7 @@ namespace MunicipalEnterprise.ViewModels
             {
                 return _dialogHeader;
             }
-            set
-            {
-                _dialogHeader = value;
-                OnPropertyChanged(nameof(DialogHeader));
-            }
+            set { SetProperty(ref _dialogHeader, value); }
         }
 
         private void OpenAddDialog(object obj)

@@ -11,7 +11,6 @@ namespace MunicipalEnterprise.Views
         public SignIn()
         {
             InitializeComponent();
-            DataContext = new SignInViewModel();
         }
     }
 }
