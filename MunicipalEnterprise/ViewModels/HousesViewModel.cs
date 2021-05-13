@@ -8,6 +8,8 @@ namespace MunicipalEnterprise.ViewModels
 {
     class HousesViewModel : BaseViewModel
     {
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
         private ObservableCollection<House> _housesList;
         public ObservableCollection<House> HousesList
         {
@@ -20,9 +22,11 @@ namespace MunicipalEnterprise.ViewModels
 
         }
 
-        public HousesViewModel()
+        public HousesViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
-            using (var context = new MyDbContext())
+            _contextFactory = contextFactory;
+
+            using (var context = _contextFactory.CreateDbContext())
             {
                 context.Houses.Where(x => x.User.Id == UserId).Load();
                 HousesList = context.Houses.Local.ToObservableCollection(); ;

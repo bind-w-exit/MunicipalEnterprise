@@ -1,10 +1,13 @@
-﻿using MunicipalEnterprise.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MunicipalEnterprise.Data;
 using System.Windows.Controls;
 
 namespace MunicipalEnterprise.ViewModels
 { 
     public class MainWindowViewModel : BaseViewModel
-    {        
+    {
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
         public Page Login;
 
         private Page _currentPage;
@@ -14,9 +17,11 @@ namespace MunicipalEnterprise.ViewModels
             set { SetProperty(ref _currentPage, value); }
         }
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
-            using (var context = new MyDbContext())
+            _contextFactory = contextFactory;
+
+            using (var context = _contextFactory.CreateDbContext())
             {
                 context.SaveChanges();
             }

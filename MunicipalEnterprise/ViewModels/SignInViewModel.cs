@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
 using MunicipalEnterprise.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MunicipalEnterprise.ViewModels
 {
     class SignInViewModel : BaseViewModel
     {
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
         private bool LoginFlag = false;
 
         private string _login;
@@ -38,8 +41,10 @@ namespace MunicipalEnterprise.ViewModels
 
         public ICommand BtnClickLogin { get; private set; }
 
-        public SignInViewModel()
+        public SignInViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
+            _contextFactory = contextFactory;
+
             BtnClickLogin = new DelegateCommand(BtnClickLoginCommand);
         }
 
@@ -52,7 +57,7 @@ namespace MunicipalEnterprise.ViewModels
             
             await Task.Run(() =>
             {
-                using (var context = new MyDbContext())
+                using (var context = _contextFactory.CreateDbContext())
                 {
                     var user = context.Users.FirstOrDefault(u => u.Login == Login);
                     if (user != null )

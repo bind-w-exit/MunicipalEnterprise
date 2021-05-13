@@ -10,8 +10,8 @@ using MunicipalEnterprise.Data;
 namespace MunicipalEnterprise.ViewModels
 {
     class PaymentsViewModel : BaseViewModel
-    {  
-       MyDbContext context = new MyDbContext();
+    {
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
 
         private ObservableCollection<Payment> _paymentsList;
         public ObservableCollection<Payment> PaymentsList
@@ -117,18 +117,22 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        public PaymentsViewModel()
+        public PaymentsViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
 
             OpenDialogCommand = new DelegateCommand(OpenDialog);
             AcceptDialogCommand = new DelegateCommand(AcceptDialog);
             CancelDialogCommand = new DelegateCommand(CancelDialog);
 
+            _contextFactory = contextFactory;
 
-            context.Payments.Where(x => x.User.Id == UserId).Load();
-            context.Houses.Where(x => x.User.Id == UserId).Load();
-            PaymentsList = context.Payments.Local.ToObservableCollection();
-            HousesList = context.Houses.Local.ToObservableCollection();
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Payments.Where(x => x.User.Id == UserId).Load();
+                context.Houses.Where(x => x.User.Id == UserId).Load();
+                PaymentsList = context.Payments.Local.ToObservableCollection();
+                HousesList = context.Houses.Local.ToObservableCollection();
+            }
         }
 
 
@@ -188,26 +192,28 @@ namespace MunicipalEnterprise.ViewModels
 
             if (!HasErrors)
             {
-                var payment = new Payment
+                using (var context = _contextFactory.CreateDbContext())
                 {
-                    Date = DateTime.Now,
-                    Cost = Convert.ToInt32(Cost),
-                    HeatMeter = Convert.ToInt32(HeatMeter)
-                };
+                    var payment = new Payment
+                    {
+                        Date = DateTime.Now,
+                        Cost = Convert.ToInt32(Cost),
+                        HeatMeter = Convert.ToInt32(HeatMeter)
+                    };
 
-                var user = context.Users.FirstOrDefault(u => u.Id == UserId);
-                var house = context.Houses.FirstOrDefault(u => u.Id == SelectedHouse.Id);
+                    var user = context.Users.FirstOrDefault(u => u.Id == UserId);
+                    var house = context.Houses.FirstOrDefault(u => u.Id == SelectedHouse.Id);
 
-                house.HeatMeter = Convert.ToInt32(HeatMeter);
+                    house.HeatMeter = Convert.ToInt32(HeatMeter);
 
-                payment.User = user;
-                payment.House = house;
-                PaymentsList.Add(payment);
-                context.SaveChanges();
-                SelectedHouse = null;
-                IsDialogOpen = false;              
+                    payment.User = user;
+                    payment.House = house;
+                    PaymentsList.Add(payment);
+                    context.SaveChanges();
+                    SelectedHouse = null;
+                    IsDialogOpen = false;
+                }
             }
-
         }
 
         #endregion

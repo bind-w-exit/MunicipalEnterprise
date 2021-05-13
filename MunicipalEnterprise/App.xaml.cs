@@ -1,5 +1,7 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Views;
 using Prism.Ioc;
 
@@ -17,7 +19,8 @@ namespace MunicipalEnterprise
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            
+            containerRegistry.RegisterSingleton<IDbContextFactory<MyDbContext>, MyDbContextFactory>();
         }
+
     }
 }

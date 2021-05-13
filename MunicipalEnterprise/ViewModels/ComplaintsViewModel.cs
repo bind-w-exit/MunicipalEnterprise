@@ -10,7 +10,7 @@ namespace MunicipalEnterprise.ViewModels
 {
     class ComplaintsViewModel : BaseViewModel
     {
-        MyDbContext context = new MyDbContext();
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
 
         private ObservableCollection<Complaint> _complaintsList;
         public ObservableCollection<Complaint> ComplaintsList
@@ -77,7 +77,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }   
 
-        public ComplaintsViewModel()
+        public ComplaintsViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
             //Dialog window
             OpenEditDialogCommand = new DelegateCommand(OpenEditDialog);
@@ -85,13 +85,16 @@ namespace MunicipalEnterprise.ViewModels
             AcceptDialogCommand = new DelegateCommand(AcceptDialog);
             CancelDialogCommand = new DelegateCommand(CancelDialog);
 
-            BtnClickDeleteComplain = new DelegateCommand(BtnClickDeleteComplainCommand);           
+            BtnClickDeleteComplain = new DelegateCommand(BtnClickDeleteComplainCommand);
 
-            context.Complaints.Where(x => x.User.Id == UserId).Load();
-            context.Districts.Load();
-            ComplaintsList = context.Complaints.Local.ToObservableCollection();
-            Districts = context.Districts.Local.ToObservableCollection();
-          
+            _contextFactory = contextFactory;
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Complaints.Where(x => x.User.Id == UserId).Load();
+                context.Districts.Load();
+                ComplaintsList = context.Complaints.Local.ToObservableCollection();
+                Districts = context.Districts.Local.ToObservableCollection();
+            }
         }
 
         public ICommand BtnClickDeleteComplain { get; }
@@ -99,7 +102,10 @@ namespace MunicipalEnterprise.ViewModels
         private void BtnClickDeleteComplainCommand(object obj)
         {           
             ComplaintsList.Remove(SelectedComplaint);
-            context.SaveChanges();
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.SaveChanges();
+            }
         }
 
         #region DialogWindow
@@ -188,9 +194,36 @@ namespace MunicipalEnterprise.ViewModels
                 }
                 if (!HasErrors)
                 {
+                    using (var context = _contextFactory.CreateDbContext())
+                    {
+                        var complain = new Complaint
+                        {
+                            Date = DateTime.Now,
+                            Description = BriefDescription,
+                            Status = "Not"
+                        };
+
+                        var user = context.Users.FirstOrDefault(u => u.Id == UserId);
+                        var district = context.Districts.FirstOrDefault(u => u.Id == SelectedDistrict.Id);
+
+                        complain.User = user;
+                        complain.District = district;
+
+                        ComplaintsList.Add(complain);
+                        context.SaveChanges();
+
+                        IsDialogOpen = false;
+                    }
+                }
+            }
+
+            else
+            {
+                using (var context = _contextFactory.CreateDbContext())
+                {
                     var complain = new Complaint
                     {
-                        Date = DateTime.Now,
+                        Date = SelectedComplaint.Date,
                         Description = BriefDescription,
                         Status = "Not"
                     };
@@ -201,37 +234,15 @@ namespace MunicipalEnterprise.ViewModels
                     complain.User = user;
                     complain.District = district;
 
+                    ComplaintsList.Remove(SelectedComplaint);
                     ComplaintsList.Add(complain);
                     context.SaveChanges();
 
                     IsDialogOpen = false;
                 }
+
             }
-
-            else
-            {
-                var complain = new Complaint
-                {
-                    Date = SelectedComplaint.Date,
-                    Description = BriefDescription,
-                    Status = "Not"
-                };
-
-                var user = context.Users.FirstOrDefault(u => u.Id == UserId);
-                var district = context.Districts.FirstOrDefault(u => u.Id == SelectedDistrict.Id);
-
-                complain.User = user;
-                complain.District = district;
-
-                ComplaintsList.Remove(SelectedComplaint);
-                ComplaintsList.Add(complain);
-                context.SaveChanges();
-
-                IsDialogOpen = false;
-            }   
-            
         }
-
         #endregion
 
     }

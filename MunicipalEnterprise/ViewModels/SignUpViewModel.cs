@@ -1,4 +1,5 @@
-﻿using MunicipalEnterprise.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Data.Models;
 using System;
 using System.Linq;
@@ -13,11 +14,14 @@ namespace MunicipalEnterprise.ViewModels
 {
     class SignUpViewModel : BaseViewModel
     {
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
 
         public ICommand BtnClickRegister { get; private set; }
 
-        public SignUpViewModel()
+        public SignUpViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
+            _contextFactory = contextFactory;
+
             BtnClickRegister = new DelegateCommand(BtnClickRegisterCommand);
         }
 
@@ -199,7 +203,7 @@ namespace MunicipalEnterprise.ViewModels
             
             await Task.Run(() =>
             {
-                using (var context = new MyDbContext())
+                using (var context = _contextFactory.CreateDbContext())
                 {
 
                     if (FirstName == "")

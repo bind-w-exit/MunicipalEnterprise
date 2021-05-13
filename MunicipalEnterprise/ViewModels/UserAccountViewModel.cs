@@ -1,4 +1,5 @@
-﻿using MunicipalEnterprise.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MunicipalEnterprise.Data;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -10,6 +11,8 @@ namespace MunicipalEnterprise.ViewModels
 {
     class UserAccountViewModel : BaseViewModel
     {
+        private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
         public ICommand BtnClickSaveChanges
         {
             get;
@@ -22,12 +25,14 @@ namespace MunicipalEnterprise.ViewModels
             private set;
         }
 
-        public UserAccountViewModel()
+        public UserAccountViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
+            _contextFactory = contextFactory;
+
             BtnClickSaveChanges = new DelegateCommand(BtnClickSaveChangesCommand);
             BtnClickUndoChanges = new DelegateCommand(BtnClickUndoChangesCommand);
 
-            using (var context = new MyDbContext())
+            using (var context = _contextFactory.CreateDbContext())
             {
                 var user = context.Users.Find(UserId);
                 if (user != null)
@@ -237,7 +242,7 @@ namespace MunicipalEnterprise.ViewModels
         {
             await Task.Run(() =>
             {
-                using (var context = new MyDbContext())
+                using (var context = _contextFactory.CreateDbContext())
                 {
 
                     if (FirstName == "")
@@ -330,7 +335,7 @@ namespace MunicipalEnterprise.ViewModels
             Login = _backupLogin;
             Password = _backupPassword;
 
-            using (var context = new MyDbContext())
+            using (var context = _contextFactory.CreateDbContext())
             {
                 var user = context.Users.Find(UserId);
 
