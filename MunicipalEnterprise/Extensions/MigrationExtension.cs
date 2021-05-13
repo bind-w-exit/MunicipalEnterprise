@@ -8,12 +8,13 @@ namespace MunicipalEnterprise.Extensions
     {
         public static void ApplyMigrations()
         {
-            MyDbContext context = new MyDbContext();
-
-            if (!context.AllMigrationsApplied())
+            using (var context = new MyDbContext())
+            {
+                if (!context.AllMigrationsApplied())
                 {
                     context.Database.Migrate();
                 }
+            }            
         }
     }
 }

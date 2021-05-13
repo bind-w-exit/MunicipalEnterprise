@@ -14,8 +14,15 @@ namespace MunicipalEnterprise.Data.Models
         public string Email { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
+        public Access AccessLevel { get; set; }
 
         public virtual ICollection<House> Houses { get; set; }
         public virtual ICollection<Complaint> Complaints { get; set; }
+    }
+
+    public enum Access
+    {
+        Administrator,
+        User
     }
 }
