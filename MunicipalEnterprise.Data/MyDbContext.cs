@@ -5,9 +5,12 @@ namespace MunicipalEnterprise.Data
 {
     public class MyDbContext : DbContext
     {
+        /// <summary>
+        /// Override this method to configure the database (and other options) to be used for this context.
+        /// </summary>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.;Database=MunicipalEnterprise;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer(@"Server=.;Database=MunicipalEnterprise;Trusted_Connection=True;");     //These Use* methods are extension methods implemented by the database provider. 
         }
 
         public DbSet<User> Users { get; set; }

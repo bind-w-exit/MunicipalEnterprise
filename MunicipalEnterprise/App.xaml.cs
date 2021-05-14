@@ -1,26 +1,27 @@
 ﻿using System.Windows;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Views;
 using Prism.Ioc;
 
 namespace MunicipalEnterprise
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App
     {
+        /// <summary>
+        /// This is the method that will create the main window of the application. 
+        /// </summary>
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();
+            return Container.Resolve<MainWindow>();     //The Container property of the App class should be used to create the window as it takes care of any dependencies.
         }
 
+        /// <summary>
+        /// This function is used to register any app dependencies.
+        /// </summary>
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<IDbContextFactory<MyDbContext>, MyDbContextFactory>();
         }
-
     }
 }

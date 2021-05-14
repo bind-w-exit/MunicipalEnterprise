@@ -8,6 +8,9 @@ namespace MunicipalEnterprise.Data.Extensions
 {
     public static class DbExtensions
     {
+        /// <summary>
+        /// This method checks that all migrations have been applied.
+        /// </summary>
         public static bool AllMigrationsApplied(this DbContext context)
         {
             try
