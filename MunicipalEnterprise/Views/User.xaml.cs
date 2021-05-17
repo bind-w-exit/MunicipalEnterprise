@@ -1,5 +1,4 @@
-﻿using MunicipalEnterprise.ViewModels;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace MunicipalEnterprise.Views
 {
@@ -11,7 +10,6 @@ namespace MunicipalEnterprise.Views
         public User()
         {
             InitializeComponent();
-            BaseViewModel.User = this;
         }
     }
 }

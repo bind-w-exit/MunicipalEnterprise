@@ -8,5 +8,6 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1000">
-    <Frame Name="MainFrame" Grid.Column="0" Content="{Binding CurrentPage}" NavigationUIVisibility="Hidden"/>
+    <Frame prism:RegionManager.RegionName="MainRegion" NavigationUIVisibility="Hidden"/>
+    <!--<Frame Name="MainFrame" Grid.Column="0" Content="{Binding CurrentPage}" NavigationUIVisibility="Hidden"/>-->
 </Window>

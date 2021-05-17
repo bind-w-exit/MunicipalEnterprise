@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Windows.Input;
+﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Data.Models;
+using Prism.Regions;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class ComplaintsViewModel : BaseViewModel
+    class ComplaintsViewModel : BaseViewModel, INavigationAware
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
+        private int _userId;
 
         private ObservableCollection<Complaint> _complaintsList;
         public ObservableCollection<Complaint> ComplaintsList
@@ -88,13 +91,6 @@ namespace MunicipalEnterprise.ViewModels
             BtnClickDeleteComplain = new DelegateCommand(BtnClickDeleteComplainCommand);
 
             _contextFactory = contextFactory;
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.Complaints.Where(x => x.User.Id == UserId).Load();
-                context.Districts.Load();
-                ComplaintsList = context.Complaints.Local.ToObservableCollection();
-                Districts = context.Districts.Local.ToObservableCollection();
-            }
         }
 
         public ICommand BtnClickDeleteComplain { get; }
@@ -203,7 +199,7 @@ namespace MunicipalEnterprise.ViewModels
                             Status = "Not"
                         };
 
-                        var user = context.Users.FirstOrDefault(u => u.Id == UserId);
+                        var user = context.Users.FirstOrDefault(u => u.Id == _userId);
                         var district = context.Districts.FirstOrDefault(u => u.Id == SelectedDistrict.Id);
 
                         complain.User = user;
@@ -228,7 +224,7 @@ namespace MunicipalEnterprise.ViewModels
                         Status = "Not"
                     };
 
-                    var user = context.Users.FirstOrDefault(u => u.Id == UserId);
+                    var user = context.Users.FirstOrDefault(u => u.Id == _userId);
                     var district = context.Districts.FirstOrDefault(u => u.Id == SelectedDistrict.Id);
 
                     complain.User = user;
@@ -243,7 +239,31 @@ namespace MunicipalEnterprise.ViewModels
 
             }
         }
+
         #endregion
 
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            var userId = navigationContext.Parameters["userId"];
+            if (userId != null)
+                _userId = (int)userId;
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Complaints.Where(x => x.User.Id == _userId).Load();
+                context.Districts.Load();
+                ComplaintsList = context.Complaints.Local.ToObservableCollection();
+                Districts = context.Districts.Local.ToObservableCollection();
+            }
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+        }
     }
 }

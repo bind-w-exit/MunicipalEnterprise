@@ -1,5 +1,4 @@
 ﻿using MunicipalEnterprise.Extensions;
-using MunicipalEnterprise.ViewModels;
 using System.Windows;
 
 namespace MunicipalEnterprise.Views
@@ -13,7 +12,6 @@ namespace MunicipalEnterprise.Views
         {
             InitializeComponent();
             MigrationExtension.ApplyMigrations();
-            BaseViewModel.MainWindow = this;
         }
     }
 }

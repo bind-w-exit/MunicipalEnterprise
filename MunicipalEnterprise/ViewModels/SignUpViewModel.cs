@@ -277,7 +277,6 @@ namespace MunicipalEnterprise.ViewModels
                             Password = HashPassword(Password)
                         };
 
-                        UserId = user.Id;
                         FirstName = "";
                         LastName = "";
                         MiddleName = "";

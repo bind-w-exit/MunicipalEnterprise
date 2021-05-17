@@ -37,10 +37,10 @@
 
 
         <TextBox Grid.Row="2" Grid.Column="1" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Bottom"  Margin="10"  materialDesign:HintAssist.Hint="Login" FontSize="15" FontWeight="SemiBold" Text="{Binding Login}" materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
-        <PasswordBox Grid.Row="3" Grid.Column="1" Style="{DynamicResource MaterialDesignFloatingHintPasswordBox}" VerticalAlignment="Bottom"  Margin="10"  materialDesign:HintAssist.Hint="Password" FontSize="15" FontWeight="SemiBold" x:Name="PasswordBox" materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Bottom"  Margin="10"  materialDesign:HintAssist.Hint="Password" FontSize="15" FontWeight="SemiBold" Text="{Binding Password}" materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
 
-        <Button Grid.Column="0" Grid.Row="4" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="Login"  Grid.ColumnSpan="3" HorizontalAlignment="Center" Width="200" Command="{Binding BtnClickLogin}" CommandParameter="{Binding ElementName=PasswordBox}" FontSize="16" />
+        <Button Grid.Column="0" Grid.Row="4" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="Login"  Grid.ColumnSpan="3" HorizontalAlignment="Center" Width="200" Command="{Binding LoginCommand}"  FontSize="16" />
 
     </Grid>
 </Page>

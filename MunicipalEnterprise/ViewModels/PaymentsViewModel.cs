@@ -1,17 +1,20 @@
-﻿using MunicipalEnterprise.Views;
+﻿using Microsoft.EntityFrameworkCore;
+using MunicipalEnterprise.Data;
+using MunicipalEnterprise.Data.Models;
+using MunicipalEnterprise.Views;
+using Prism.Regions;
 using System;
 using System.Collections.ObjectModel;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Windows.Input;
-using MunicipalEnterprise.Data.Models;
-using MunicipalEnterprise.Data;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class PaymentsViewModel : BaseViewModel
+    public class PaymentsViewModel : BaseViewModel, INavigationAware
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
+        private int _userId;
 
         private ObservableCollection<Payment> _paymentsList;
         public ObservableCollection<Payment> PaymentsList
@@ -119,22 +122,12 @@ namespace MunicipalEnterprise.ViewModels
 
         public PaymentsViewModel(IDbContextFactory<MyDbContext> contextFactory)
         {
-
             OpenDialogCommand = new DelegateCommand(OpenDialog);
             AcceptDialogCommand = new DelegateCommand(AcceptDialog);
             CancelDialogCommand = new DelegateCommand(CancelDialog);
 
             _contextFactory = contextFactory;
-
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.Payments.Where(x => x.User.Id == UserId).Load();
-                context.Houses.Where(x => x.User.Id == UserId).Load();
-                PaymentsList = context.Payments.Local.ToObservableCollection();
-                HousesList = context.Houses.Local.ToObservableCollection();
-            }
         }
-
 
         #region DialogWindow
 
@@ -201,7 +194,7 @@ namespace MunicipalEnterprise.ViewModels
                         HeatMeter = Convert.ToInt32(HeatMeter)
                     };
 
-                    var user = context.Users.FirstOrDefault(u => u.Id == UserId);
+                    var user = context.Users.FirstOrDefault(u => u.Id == _userId);
                     var house = context.Houses.FirstOrDefault(u => u.Id == SelectedHouse.Id);
 
                     house.HeatMeter = Convert.ToInt32(HeatMeter);
@@ -217,5 +210,29 @@ namespace MunicipalEnterprise.ViewModels
         }
 
         #endregion
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            var userId = navigationContext.Parameters["userId"];
+            if (userId != null)
+                _userId = (int)userId;
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Payments.Where(x => x.User.Id == _userId).Load();
+                context.Houses.Where(x => x.User.Id == _userId).Load();
+                PaymentsList = context.Payments.Local.ToObservableCollection();
+                HousesList = context.Houses.Local.ToObservableCollection();
+            }
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+        }
     }
 }

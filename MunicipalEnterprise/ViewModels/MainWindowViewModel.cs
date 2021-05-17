@@ -1,33 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MunicipalEnterprise.Data;
-using System.Windows.Controls;
+﻿using MunicipalEnterprise.Views;
+using Prism.Ioc;
+using Prism.Regions;
 
 namespace MunicipalEnterprise.ViewModels
-{ 
+{
     public class MainWindowViewModel : BaseViewModel
     {
-        private readonly IDbContextFactory<MyDbContext> _contextFactory;
+        private readonly IRegionManager _regionManager;
 
-        public Page Login;
-
-        private Page _currentPage;
-        public Page CurrentPage
+        public MainWindowViewModel(IContainerExtension container, IRegionManager regionManager)
         {
-            get { return _currentPage; }
-            set { SetProperty(ref _currentPage, value); }
-        }
-
-        public MainWindowViewModel(IDbContextFactory<MyDbContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.SaveChanges();
-            }
-
-            Login = new Views.Login();
-            CurrentPage = Login;
+            _regionManager = regionManager;
+            _regionManager.RegisterViewWithRegion("MainRegion", typeof(Login));
         }      
     }
 }

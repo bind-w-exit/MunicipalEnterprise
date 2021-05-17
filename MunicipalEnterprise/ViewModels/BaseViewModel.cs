@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Collections;
 using System.Linq;
-using MunicipalEnterprise.Views;
-using Prism.Mvvm;
 
 namespace MunicipalEnterprise.ViewModels
 {
     public class BaseViewModel : BindableBase, INotifyDataErrorInfo
     {        
-
 
         private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
 
@@ -43,10 +41,6 @@ namespace MunicipalEnterprise.ViewModels
         {
             _propertyErrors.Remove(propertyName);
         }
-
-        public static MainWindow MainWindow { get; set; }
-        public static User User { get; set; }
-        public static int UserId { get; set; }
     }
 
 }

@@ -1,78 +1,49 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
+﻿using Prism.Commands;
+using Prism.Regions;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class UserViewModel : BaseViewModel
+    class UserViewModel : BaseViewModel, INavigationAware
     {
-        private Page Houses;
-        private Page Payments;
-        private Page Complains;
-        private Page UserAccount;
+        private readonly IRegionManager _regionManager;
 
-        private Page _currentPage;
-        public Page CurrentPage
+        private int _userId;
+
+        private NavigationParameters parameters;
+
+        public DelegateCommand<string> NavigateCommand { get; private set; }
+
+
+        public UserViewModel(IRegionManager regionManager)
         {
-            get { return _currentPage; }
-            set
-            {
-                if (_currentPage == value)
-                    return;
-
-                SetProperty(ref _currentPage, value);
-            }
+            _regionManager = regionManager;         
+            NavigateCommand = new DelegateCommand<string>(Navigate);
         }
 
-        public ICommand BtnClickHouses { get; private set; }
-
-        public ICommand BtnClickPayments { get; private set; }
-
-        public ICommand BtnClickComplains { get; private set; }
-
-        public ICommand BtnClickUserAccount { get; private set; }
-
-        public ICommand BtnClickLogout { get; private set; }
-
-        public UserViewModel()
+        private void Navigate(string navigatePath)
         {
-            BtnClickHouses = new DelegateCommand(BtnClickHousesCommand);
-            BtnClickPayments = new DelegateCommand(BtnClickPaymentsCommand);
-            BtnClickComplains = new DelegateCommand(BtnClickComplainsCommand);
-            BtnClickUserAccount = new DelegateCommand(BtnClickUserAccountCommand);
-            BtnClickLogout = new DelegateCommand(BtnClickLogoutCommand);
-
-            Houses = new Views.Houses();
-            Payments = new Views.Payments();
-            Complains = new Views.Complaints();
-            UserAccount = new Views.UserAccount();
-
-
-            CurrentPage = new Views.Houses();
+            if (navigatePath != null)
+                _regionManager.RequestNavigate("UserRegion", navigatePath, parameters);
         }
 
-        private void BtnClickLogoutCommand(object obj)
+        public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            MainWindow.MainFrame.Navigate(new Views.Login());
+            var userId = navigationContext.Parameters["userId"];
+            if (userId != null)
+                _userId = (int)userId;
+
+            parameters = new NavigationParameters();
+            parameters.Add("userId", _userId);
+            _regionManager.RequestNavigate("UserRegion", "Houses", parameters);
         }
 
-        private void BtnClickUserAccountCommand(object obj)
+        public bool IsNavigationTarget(NavigationContext navigationContext)
         {
-            CurrentPage = UserAccount;
+            return true;
         }
 
-        private void BtnClickComplainsCommand(object obj)
+        public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            CurrentPage = Complains;
-        }
-
-        private void BtnClickPaymentsCommand(object obj)
-        {
-            CurrentPage = Payments;
-        }
-
-        private void BtnClickHousesCommand(object obj)
-        {
-            CurrentPage = Houses;
         }
     }
 }

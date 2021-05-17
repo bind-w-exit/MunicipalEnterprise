@@ -1,53 +1,26 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
-
+﻿using MunicipalEnterprise.Views;
+using Prism.Commands;
+using Prism.Regions;
 
 namespace MunicipalEnterprise.ViewModels
 {
     class LoginViewModel : BaseViewModel
     {
-        private Page SignIn;
-        private Page SignUp;
-     
-        private Page _currentPage;
-        public Page CurrentPage
+        private readonly IRegionManager _regionManager;
+
+        public DelegateCommand<string> NavigateCommand { get; private set; }
+
+        public LoginViewModel(IRegionManager regionManager)
         {
-            get { return _currentPage; }
-            set { SetProperty(ref _currentPage, value); }
+            _regionManager = regionManager;
+            _regionManager.RegisterViewWithRegion("LoginRegion", typeof(SignIn));
+            NavigateCommand = new DelegateCommand<string>(Navigate);
         }
 
-        public ICommand BtnClickSignIn
+        private void Navigate(string navigatePath)
         {
-            get;
-            private set;
-        }
-
-        public ICommand BtnClickSignUp
-        {
-            get;
-            private set;
-        }
-
-        public LoginViewModel()
-        {
-
-            SignIn = new Views.SignIn();
-            SignUp = new Views.SignUp();
-
-            BtnClickSignIn = new DelegateCommand(BtnClickSignInCommand);
-            BtnClickSignUp = new DelegateCommand(BtnClickSignUpCommand);
-
-            CurrentPage = SignIn;
-        }
-
-        private void BtnClickSignUpCommand(object obj)
-        {
-            CurrentPage = SignUp;
-        }
-
-        private void BtnClickSignInCommand(object obj)
-        {
-            CurrentPage = SignIn;
+            if (navigatePath != null)
+                _regionManager.RequestNavigate("LoginRegion", navigatePath);
         }
     }
 }

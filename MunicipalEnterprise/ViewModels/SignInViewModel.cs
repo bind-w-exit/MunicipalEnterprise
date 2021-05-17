@@ -1,19 +1,21 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
+﻿using Microsoft.EntityFrameworkCore;
+using MunicipalEnterprise.Data;
+using MunicipalEnterprise.Data.Models;
+using Prism.Commands;
+using Prism.Regions;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
-using MunicipalEnterprise.Data;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace MunicipalEnterprise.ViewModels
 {
     class SignInViewModel : BaseViewModel
     {
+        private readonly IRegionManager _regionManager;
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
 
-        private bool LoginFlag = false;
+        private int _userId;
 
         private string _login;
         public string Login
@@ -22,7 +24,6 @@ namespace MunicipalEnterprise.ViewModels
             set
             {
                 SetProperty(ref _login, value);
-
                 ClearErrors(nameof(Login));
             }
         }
@@ -34,38 +35,32 @@ namespace MunicipalEnterprise.ViewModels
             set
             {
                 SetProperty(ref _password, value);
-
                 ClearErrors(nameof(Password));
             }
         }
 
-        public ICommand BtnClickLogin { get; private set; }
+        public DelegateCommand<User> LoginCommand { get; private set; }
 
-        public SignInViewModel(IDbContextFactory<MyDbContext> contextFactory)
+        public SignInViewModel(IRegionManager regionManager, IDbContextFactory<MyDbContext> contextFactory)
         {
             _contextFactory = contextFactory;
+            _regionManager = regionManager;
 
-            BtnClickLogin = new DelegateCommand(BtnClickLoginCommand);
+            LoginCommand = new DelegateCommand<User>(LoginUser);
         }
 
-        private async  void BtnClickLoginCommand(object obj)
+        private async void LoginUser(User user)
         {
-            var passwordBox = obj as PasswordBox;
-            if (passwordBox == null)
-                return;
-            Password = passwordBox.Password;   
-            
             await Task.Run(() =>
             {
                 using (var context = _contextFactory.CreateDbContext())
                 {
                     var user = context.Users.FirstOrDefault(u => u.Login == Login);
-                    if (user != null )
+                    if (user != null)
                     {
                         if (user.Password == HashPassword(Password))
                         {
-                            LoginFlag = true;
-                            UserId = user.Id;
+                            _userId = user.Id;
                         }
                         else
                         {
@@ -79,11 +74,12 @@ namespace MunicipalEnterprise.ViewModels
                 }
             });
 
-            if (LoginFlag)
+            if (!HasErrors)
             {
-                MainWindow.MainFrame.Navigate(new Views.User());
-                LoginFlag = false;
-            }        
+                var parameters = new NavigationParameters();
+                parameters.Add("userId", _userId);
+                _regionManager.RequestNavigate("MainRegion", "User", parameters);
+            }
         }
 
         public string HashPassword(string s)

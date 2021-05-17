@@ -18,7 +18,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid Background="{DynamicResource PrimaryHueMidBrush}">
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="350"/>
@@ -32,26 +32,26 @@
 
             <StackPanel Grid.Row="1" VerticalAlignment="Center">
 
-                <Button Background="{x:Null}"  BorderBrush="{x:Null}" Height="40" Margin="25, 0, 0, 0" HorizontalAlignment="Left" Command="{Binding Path=BtnClickSignIn}">
+                <Button Background="{x:Null}"  BorderBrush="{x:Null}" Height="40" Margin="25, 0, 0, 0" HorizontalAlignment="Left" Command="{Binding NavigateCommand}" CommandParameter="SignIn">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="AccountArrowRight" Margin="0, 7, 10, 0"/>
                         <TextBlock TextAlignment="Center" FontSize="20" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">Sign in</TextBlock>
                     </StackPanel>
                 </Button>
-                
-                <Button Background="{x:Null}" Height="40" BorderBrush="{x:Null}" Margin="25, 15, 0, 0" HorizontalAlignment="Left" Command="{Binding Path=BtnClickSignUp}" >
+
+                <Button Background="{x:Null}" Height="40" BorderBrush="{x:Null}" Margin="25, 15, 0, 0" HorizontalAlignment="Left" Command="{Binding NavigateCommand}" CommandParameter="SignUp">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="AccountPlus" Margin="0, 7, 10, 0"/>
                         <TextBlock TextAlignment="Center" FontSize="20" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">Sign up</TextBlock>
                     </StackPanel>
                 </Button>
-                
+
             </StackPanel>
 
         </Grid>
-        
+
         <Frame Grid.Column="1"
-               Content="{Binding CurrentPage}"
+               prism:RegionManager.RegionName="LoginRegion"
                Background="{DynamicResource PrimaryHueLightBrush}"
                NavigationUIVisibility="Hidden"/>
         

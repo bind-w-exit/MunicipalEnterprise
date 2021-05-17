@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
+using Prism.Regions;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,9 +10,11 @@ using System.Windows.Input;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class UserAccountViewModel : BaseViewModel
+    class UserAccountViewModel : BaseViewModel, INavigationAware
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
+
+        private int _userId;
 
         public ICommand BtnClickSaveChanges
         {
@@ -31,33 +34,9 @@ namespace MunicipalEnterprise.ViewModels
 
             BtnClickSaveChanges = new DelegateCommand(BtnClickSaveChangesCommand);
             BtnClickUndoChanges = new DelegateCommand(BtnClickUndoChangesCommand);
-
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var user = context.Users.Find(UserId);
-                if (user != null)
-                {
-                    FirstName = user.FirstName;
-                    LastName = user.LastName;
-                    MiddleName = user.MiddleName;
-                    DateOfBirth = user.DateOfBirth;
-                    PhoneNum = user.PhoneNum;
-                    Email = user.Email;
-                    Login = user.Login;
-
-                    _backupFirstName = user.FirstName;
-                    _backupLastName = user.LastName;
-                    _backupMiddleName = user.MiddleName;
-                    _backupDateOfBirth = user.DateOfBirth;
-                    _backupPhoneNum = user.PhoneNum;
-                    _backupEmail = user.Email;
-                    _backupLogin = user.Login;
-                    _backupPassword = user.Password;
-                }
-            }
         }
 
-        private string _backupFirstName; //TODO User
+        private string _backupFirstName;
         private string _backupLastName;
         private string _backupMiddleName;
         private DateTime _backupDateOfBirth;
@@ -222,8 +201,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        public string _password = "";
-
+        private string _password = "";       
         public string Password
         {
             get { return _password; }
@@ -268,7 +246,7 @@ namespace MunicipalEnterprise.ViewModels
                     else
                     {
                         var user = context.Users.FirstOrDefault(u => u.PhoneNum == PhoneNum);
-                        if (user != null &&  context.Users.Find(UserId).PhoneNum != PhoneNum)
+                        if (user != null &&  context.Users.Find(_userId).PhoneNum != PhoneNum)
                         {
                             AddError(nameof(PhoneNum), "Phone number is already exists");
                         }
@@ -280,7 +258,7 @@ namespace MunicipalEnterprise.ViewModels
                     else
                     {
                         var user = context.Users.FirstOrDefault(u => u.Email == Email);
-                        if (user != null && context.Users.Find(UserId).Email != Email)
+                        if (user != null && context.Users.Find(_userId).Email != Email)
                         {
                             AddError(nameof(Email), "Email already exists");
                         }
@@ -292,7 +270,7 @@ namespace MunicipalEnterprise.ViewModels
                     else
                     {
                         var user = context.Users.FirstOrDefault(u => u.Login == Login);
-                        if (user != null && context.Users.Find(UserId).Login != Login)
+                        if (user != null && context.Users.Find(_userId).Login != Login)
                         {
                             AddError(nameof(Login), "Login already exists");
                         }
@@ -304,7 +282,7 @@ namespace MunicipalEnterprise.ViewModels
 
                     if (!HasErrors)
                     {
-                        var user = context.Users.Find(UserId);
+                        var user = context.Users.Find(_userId);
 
                         user.FirstName = FirstName;
                         user.LastName = LastName;
@@ -337,7 +315,7 @@ namespace MunicipalEnterprise.ViewModels
 
             using (var context = _contextFactory.CreateDbContext())
             {
-                var user = context.Users.Find(UserId);
+                var user = context.Users.Find(_userId);
 
                 user.FirstName = _backupFirstName;
                 user.LastName = _backupLastName;
@@ -367,6 +345,46 @@ namespace MunicipalEnterprise.ViewModels
                 hash += string.Format("{0:x2}", b);
 
             return hash;
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            var userId = navigationContext.Parameters["userId"];
+            if (userId != null)
+                _userId = (int)userId;
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var user = context.Users.Find(_userId);
+                if (user != null)
+                {
+                    FirstName = user.FirstName;
+                    LastName = user.LastName;
+                    MiddleName = user.MiddleName;
+                    DateOfBirth = user.DateOfBirth;
+                    PhoneNum = user.PhoneNum;
+                    Email = user.Email;
+                    Login = user.Login;
+
+                    _backupFirstName = user.FirstName;
+                    _backupLastName = user.LastName;
+                    _backupMiddleName = user.MiddleName;
+                    _backupDateOfBirth = user.DateOfBirth;
+                    _backupPhoneNum = user.PhoneNum;
+                    _backupEmail = user.Email;
+                    _backupLogin = user.Login;
+                    _backupPassword = user.Password;
+                }
+            }
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
     }
 }
