@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Data.Models;
+using MunicipalEnterprise.Extensions;
 using MunicipalEnterprise.Views;
-using Prism.Regions;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,11 +10,9 @@ using System.Windows.Input;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    public class PaymentsViewModel : BaseViewModel, INavigationAware
+    public class PaymentsViewModel : BaseViewModel
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
-
-        private int _userId;
 
         private ObservableCollection<Payment> _paymentsList;
         public ObservableCollection<Payment> PaymentsList
@@ -26,17 +24,6 @@ namespace MunicipalEnterprise.ViewModels
 
             set { SetProperty(ref _paymentsList, value); }
 
-        }
-
-        private Complaint _selectedPayment;
-        public Complaint SelectedPayment
-        {
-            get
-            {
-                return _selectedPayment;
-            }
-
-            set { SetProperty(ref _selectedPayment, value); }
         }
 
         private ObservableCollection<House> _housesList;
@@ -61,8 +48,8 @@ namespace MunicipalEnterprise.ViewModels
 
             set
             {
-                OldHeatMeter = Convert.ToString(SelectedHouse?.HeatMeter);
                 SetProperty(ref _selectedHouse, value);
+                OldHeatMeter = Convert.ToString(SelectedHouse?.HeatMeter);               
             }
         }
 
@@ -120,13 +107,20 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        public PaymentsViewModel(IDbContextFactory<MyDbContext> contextFactory)
+        public PaymentsViewModel(IDbContextFactory<MyDbContext> contextFactory, IAuthService authService)
         {
             OpenDialogCommand = new DelegateCommand(OpenDialog);
             AcceptDialogCommand = new DelegateCommand(AcceptDialog);
             CancelDialogCommand = new DelegateCommand(CancelDialog);
 
+            _authService = authService;
             _contextFactory = contextFactory;
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                PaymentsList = new ObservableCollection<Payment>(context.Payments.Where(x => x.User == _authService.User));
+                HousesList = new ObservableCollection<House>(context.Houses.Where(x => x.User == _authService.User));
+            }
         }
 
         #region DialogWindow
@@ -135,6 +129,7 @@ namespace MunicipalEnterprise.ViewModels
         public ICommand AcceptDialogCommand { get; }
         public ICommand CancelDialogCommand { get; }
 
+        private readonly IAuthService _authService;
         private bool _isDialogOpen;
         public bool IsDialogOpen
         {
@@ -160,7 +155,7 @@ namespace MunicipalEnterprise.ViewModels
             DialogContent = new PaymentsDialog();
             Cost = "";
             HeatMeter = "";
-            
+            SelectedHouse = HousesList.FirstOrDefault();
             IsDialogOpen = true;
         }
 
@@ -194,16 +189,18 @@ namespace MunicipalEnterprise.ViewModels
                         HeatMeter = Convert.ToInt32(HeatMeter)
                     };
 
-                    var user = context.Users.FirstOrDefault(u => u.Id == _userId);
-                    var house = context.Houses.FirstOrDefault(u => u.Id == SelectedHouse.Id);
+                    var user = context.Users.FirstOrDefault(u => u == _authService.User);
+                    var house = context.Houses.FirstOrDefault(h => h.Id == SelectedHouse.Id);
+                    SelectedHouse.HeatMeter = Convert.ToInt32(HeatMeter);
 
                     house.HeatMeter = Convert.ToInt32(HeatMeter);
 
                     payment.User = user;
                     payment.House = house;
                     PaymentsList.Add(payment);
+                    context.Add(payment);
                     context.SaveChanges();
-                    SelectedHouse = null;
+                    HousesList = new ObservableCollection<House>(context.Houses.Where(x => x.User == _authService.User));                   
                     IsDialogOpen = false;
                 }
             }
@@ -211,28 +208,6 @@ namespace MunicipalEnterprise.ViewModels
 
         #endregion
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            var userId = navigationContext.Parameters["userId"];
-            if (userId != null)
-                _userId = (int)userId;
 
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.Payments.Where(x => x.User.Id == _userId).Load();
-                context.Houses.Where(x => x.User.Id == _userId).Load();
-                PaymentsList = context.Payments.Local.ToObservableCollection();
-                HousesList = context.Houses.Local.ToObservableCollection();
-            }
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-        }
     }
 }

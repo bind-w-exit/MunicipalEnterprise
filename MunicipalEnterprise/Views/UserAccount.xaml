@@ -118,16 +118,18 @@
                  Text="{Binding Email}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
-        <TextBox materialDesign:HintAssist.Hint="New password"
+        <TextBox materialDesign:HintAssist.Hint="Access level"
                  Grid.Row="5"
                  Grid.Column="1"
                  Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
-                 VerticalAlignment="Bottom"
+                 VerticalAlignment="Bottom"              
                  Margin="0,0,30,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding Password}"
+                 IsReadOnly="True"
+                 Text="{Binding AccessLevel}" 
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
+
 
         <StackPanel Grid.Column="1"
                     Grid.Row="6"
@@ -138,13 +140,13 @@
             <Button  Content="Undo all changes"
                      Style="{DynamicResource MaterialDesignRaisedDarkButton}"
                      Width="200"
-                     Command="{Binding BtnClickUndoChanges}"
+                     Command="{Binding UndoChangesCommand}"
                      Margin="0,0,50,0"/>
             
             <Button Content="Save changes"
                     Style="{DynamicResource MaterialDesignRaisedDarkButton}" 
                     Width="200"
-                    Command="{Binding BtnClickSaveChanges}" />
+                    Command="{Binding SaveChangesCommand}" />
 
         </StackPanel>
 

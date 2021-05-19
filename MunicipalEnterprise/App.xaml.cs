@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
+using MunicipalEnterprise.Extensions;
 using MunicipalEnterprise.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -23,6 +24,7 @@ namespace MunicipalEnterprise
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<IDbContextFactory<MyDbContext>, MyDbContextFactory>();
+            containerRegistry.RegisterSingleton<IAuthService, AuthManager>();
 
             containerRegistry.RegisterForNavigation<SignIn>();
             containerRegistry.RegisterForNavigation<SignUp>();

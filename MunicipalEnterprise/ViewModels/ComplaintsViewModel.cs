@@ -1,19 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Data.Models;
-using Prism.Regions;
+using MunicipalEnterprise.Extensions;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class ComplaintsViewModel : BaseViewModel, INavigationAware
+    class ComplaintsViewModel : BaseViewModel
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
-
-        private int _userId;
+        private readonly IAuthService _authService;
 
         private ObservableCollection<Complaint> _complaintsList;
         public ObservableCollection<Complaint> ComplaintsList
@@ -78,39 +76,45 @@ namespace MunicipalEnterprise.ViewModels
                 SetProperty(ref _briefDescription, value);
                 ClearErrors(nameof(BriefDescription));
             }
-        }   
+        }
 
-        public ComplaintsViewModel(IDbContextFactory<MyDbContext> contextFactory)
+        public DelegateCommand DeleteComplainCommand { get; private set; }
+
+        public ComplaintsViewModel(IDbContextFactory<MyDbContext> contextFactory, IAuthService authService)
         {
-            //Dialog window
+            _contextFactory = contextFactory;
+            _authService = authService;
+
             OpenEditDialogCommand = new DelegateCommand(OpenEditDialog);
             OpenAddDialogCommand = new DelegateCommand(OpenAddDialog);
             AcceptDialogCommand = new DelegateCommand(AcceptDialog);
             CancelDialogCommand = new DelegateCommand(CancelDialog);
+            DeleteComplainCommand = new DelegateCommand(DeleteComplain);
 
-            BtnClickDeleteComplain = new DelegateCommand(BtnClickDeleteComplainCommand);
-
-            _contextFactory = contextFactory;
-        }
-
-        public ICommand BtnClickDeleteComplain { get; }
-
-        private void BtnClickDeleteComplainCommand(object obj)
-        {           
-            ComplaintsList.Remove(SelectedComplaint);
             using (var context = _contextFactory.CreateDbContext())
             {
+                ComplaintsList = new ObservableCollection<Complaint>(context.Complaints.Where(x => x.User == _authService.User));
+                Districts = new ObservableCollection<District>(context.Districts);
+            }
+        }       
+
+        private void DeleteComplain(object obj)
+        {                      
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Remove(SelectedComplaint);
                 context.SaveChanges();
             }
+            ComplaintsList.Remove(SelectedComplaint);
         }
 
         #region DialogWindow
 
-        public ICommand OpenAddDialogCommand { get; }
-        public ICommand OpenEditDialogCommand { get; }
-        public ICommand AcceptDialogCommand { get; }
-        public ICommand CancelDialogCommand { get; }
-        
+        public DelegateCommand OpenAddDialogCommand { get; private set; }
+        public DelegateCommand OpenEditDialogCommand { get; private set; }
+        public DelegateCommand AcceptDialogCommand { get; private set; }
+        public DelegateCommand CancelDialogCommand { get; private set; }
+
         private bool _isDialogOpen;
         public bool IsDialogOpen
         {
@@ -141,22 +145,22 @@ namespace MunicipalEnterprise.ViewModels
             set { SetProperty(ref _dialogContent, value); }
         }
 
-        private string _dialogHeader;
-        public string DialogHeader
+        private string _dialogTitle;
+        public string DialogTitle
         {
             get
             {
-                return _dialogHeader;
+                return _dialogTitle;
             }
-            set { SetProperty(ref _dialogHeader, value); }
+            set { SetProperty(ref _dialogTitle, value); }
         }
 
         private void OpenAddDialog(object obj)
         {
             DialogContent = new ComplaintsDialog();
-            DialogHeader = "Add complaint";
+            DialogTitle = "Add complaint";
             BriefDescription = "";
-            SelectedDistrict = null;
+            SelectedDistrict = Districts.FirstOrDefault();
             IsAddDialog = true;
             IsDialogOpen = true;          
         }
@@ -166,9 +170,9 @@ namespace MunicipalEnterprise.ViewModels
             if (SelectedComplaint != null)
             {
                 DialogContent = new ComplaintsDialog();
-                DialogHeader = "Editing complaint";
+                DialogTitle = "Editing complaint";
                 BriefDescription = SelectedComplaint.Description;
-                SelectedDistrict = SelectedComplaint.District;
+                SelectedDistrict = Districts.FirstOrDefault();
                 IsAddDialog = false;
                 IsDialogOpen = true;               
             }
@@ -178,92 +182,49 @@ namespace MunicipalEnterprise.ViewModels
 
         private void AcceptDialog(object obj)
         {
-            if (IsAddDialog)
+            if (string.IsNullOrEmpty(BriefDescription))
             {
-                if (string.IsNullOrEmpty(BriefDescription))
-                {
-                    AddError(nameof(BriefDescription), "Field cannot be empty");
-                }
-                if (SelectedDistrict == null)
-                {
-                    AddError(nameof(SelectedDistrict), "Field cannot be empty");
-                }
-                if (!HasErrors)
-                {
-                    using (var context = _contextFactory.CreateDbContext())
-                    {
-                        var complain = new Complaint
-                        {
-                            Date = DateTime.Now,
-                            Description = BriefDescription,
-                            Status = "Not"
-                        };
-
-                        var user = context.Users.FirstOrDefault(u => u.Id == _userId);
-                        var district = context.Districts.FirstOrDefault(u => u.Id == SelectedDistrict.Id);
-
-                        complain.User = user;
-                        complain.District = district;
-
-                        ComplaintsList.Add(complain);
-                        context.SaveChanges();
-
-                        IsDialogOpen = false;
-                    }
-                }
+                AddError(nameof(BriefDescription), "Field cannot be empty");
             }
-
-            else
+            if (SelectedDistrict == null)
             {
+                AddError(nameof(SelectedDistrict), "Field cannot be empty");
+            }
+            if (!HasErrors)
+            {
+
                 using (var context = _contextFactory.CreateDbContext())
                 {
                     var complain = new Complaint
                     {
-                        Date = SelectedComplaint.Date,
+                        Date = DateTime.Now,
                         Description = BriefDescription,
                         Status = "Not"
                     };
 
-                    var user = context.Users.FirstOrDefault(u => u.Id == _userId);
-                    var district = context.Districts.FirstOrDefault(u => u.Id == SelectedDistrict.Id);
+                    complain.User = context.Users.Find(_authService.User.Id);
+                    complain.District = context.Districts.Find(SelectedDistrict.Id);
 
-                    complain.User = user;
-                    complain.District = district;
-
-                    ComplaintsList.Remove(SelectedComplaint);
-                    ComplaintsList.Add(complain);
-                    context.SaveChanges();
+                    if (IsAddDialog)
+                    {                       
+                        context.Add(complain);
+                        context.SaveChanges();
+                        ComplaintsList.Add(complain);
+                    }
+                    else
+                    {
+                        context.Remove(SelectedComplaint);      //TODO FIX THIS!!!
+                        context.Add(complain);
+                        context.SaveChanges();
+                        ComplaintsList.Remove(SelectedComplaint);
+                        ComplaintsList.Add(complain);
+                    }
 
                     IsDialogOpen = false;
-                }
-
-            }
+                }              
+            }                    
         }
 
         #endregion
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            var userId = navigationContext.Parameters["userId"];
-            if (userId != null)
-                _userId = (int)userId;
-
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.Complaints.Where(x => x.User.Id == _userId).Load();
-                context.Districts.Load();
-                ComplaintsList = context.Complaints.Local.ToObservableCollection();
-                Districts = context.Districts.Local.ToObservableCollection();
-            }
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-        }
     }
 }

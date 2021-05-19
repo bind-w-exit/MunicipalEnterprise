@@ -1,51 +1,51 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
-using Prism.Regions;
+using MunicipalEnterprise.Data.Models;
+using MunicipalEnterprise.Extensions;
 using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class UserAccountViewModel : BaseViewModel, INavigationAware
+    class UserAccountViewModel : BaseViewModel
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
+        private readonly IAuthService _authService;
 
-        private int _userId;
+        public DelegateCommand SaveChangesCommand { get; private set; }
+        public DelegateCommand UndoChangesCommand { get; private set; }
 
-        public ICommand BtnClickSaveChanges
-        {
-            get;
-            private set;
-        }
-
-        public ICommand BtnClickUndoChanges
-        {
-            get;
-            private set;
-        }
-
-        public UserAccountViewModel(IDbContextFactory<MyDbContext> contextFactory)
+        public UserAccountViewModel(IDbContextFactory<MyDbContext> contextFactory, IAuthService authService)
         {
             _contextFactory = contextFactory;
+            _authService = authService;
 
-            BtnClickSaveChanges = new DelegateCommand(BtnClickSaveChangesCommand);
-            BtnClickUndoChanges = new DelegateCommand(BtnClickUndoChangesCommand);
+            SaveChangesCommand = new DelegateCommand(SaveChanges);
+            UndoChangesCommand = new DelegateCommand(UndoChanges);
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var user = context.Users.Find(_authService.User.Id);
+                if (user != null)
+                {
+                    FirstName = user.FirstName;
+                    LastName = user.LastName;
+                    MiddleName = user.MiddleName;
+                    DateOfBirth = user.DateOfBirth;
+                    PhoneNum = user.PhoneNum;
+                    Email = user.Email;
+                    Login = user.Login;
+                    AccessLevel = user.AccessLevel.ToString();
+
+                    _backupUser = user;
+                }
+            }
         }
 
-        private string _backupFirstName;
-        private string _backupLastName;
-        private string _backupMiddleName;
-        private DateTime _backupDateOfBirth;
-        private string _backupPhoneNum;
-        private string _backupEmail;
-        private string _backupLogin;
-        private string _backupPassword;
+        private User _backupUser;
 
-        private string _firstName = "";
+        private string _firstName;
         public string FirstName
         {
             get { return _firstName; }
@@ -65,7 +65,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private string _lastName = "";
+        private string _lastName;
         public string LastName
         {
             get { return _lastName; }
@@ -85,7 +85,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private string _middleName = "";
+        private string _middleName;
         public string MiddleName
         {
             get { return _middleName; }
@@ -105,7 +105,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private DateTime _dateOfBirth = DateTime.Today;
+        private DateTime _dateOfBirth;
         public DateTime DateOfBirth
         {
             get { return _dateOfBirth; }
@@ -125,7 +125,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private string _phoneNum = "";
+        private string _phoneNum;
         public string PhoneNum
         {
             get { return _phoneNum; }
@@ -157,7 +157,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private string _email = "";
+        private string _email;
         public string Email
         {
             get { return _email; }
@@ -186,7 +186,7 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private string _login = "";
+        private string _login;
         public string Login
         {
             get { return _login; }
@@ -201,22 +201,22 @@ namespace MunicipalEnterprise.ViewModels
             }
         }
 
-        private string _password = "";       
-        public string Password
+        private string _accessLevel;       
+        public string AccessLevel
         {
-            get { return _password; }
+            get { return _accessLevel; }
             set
             {
-                if (_password == value)
+                if (_accessLevel == value)
                     return;
 
-                SetProperty(ref _password, value);
+                SetProperty(ref _accessLevel, value);
 
-                ClearErrors(nameof(Password));
+                ClearErrors(nameof(AccessLevel));
             }
         }
 
-        private async void BtnClickSaveChangesCommand(object obj)
+        private async void SaveChanges(object obj)
         {
             await Task.Run(() =>
             {
@@ -246,7 +246,7 @@ namespace MunicipalEnterprise.ViewModels
                     else
                     {
                         var user = context.Users.FirstOrDefault(u => u.PhoneNum == PhoneNum);
-                        if (user != null &&  context.Users.Find(_userId).PhoneNum != PhoneNum)
+                        if (user != null &&  context.Users.Find(_authService.User.Id).PhoneNum != PhoneNum)
                         {
                             AddError(nameof(PhoneNum), "Phone number is already exists");
                         }
@@ -258,7 +258,7 @@ namespace MunicipalEnterprise.ViewModels
                     else
                     {
                         var user = context.Users.FirstOrDefault(u => u.Email == Email);
-                        if (user != null && context.Users.Find(_userId).Email != Email)
+                        if (user != null && context.Users.Find(_authService.User.Id).Email != Email)
                         {
                             AddError(nameof(Email), "Email already exists");
                         }
@@ -270,19 +270,15 @@ namespace MunicipalEnterprise.ViewModels
                     else
                     {
                         var user = context.Users.FirstOrDefault(u => u.Login == Login);
-                        if (user != null && context.Users.Find(_userId).Login != Login)
+                        if (user != null && context.Users.Find(_authService.User.Id).Login != Login)
                         {
                             AddError(nameof(Login), "Login already exists");
                         }
                     }
-                    if (Password == "")
-                    {
-                        AddError(nameof(Password), "Field cannot be empty");
-                    }
 
                     if (!HasErrors)
                     {
-                        var user = context.Users.Find(_userId);
+                        var user = context.Users.Find(_authService.User.Id);
 
                         user.FirstName = FirstName;
                         user.LastName = LastName;
@@ -291,8 +287,6 @@ namespace MunicipalEnterprise.ViewModels
                         user.PhoneNum = PhoneNum;
                         user.Email = Email;
                         user.Login = Login;
-                        if(!String.IsNullOrEmpty(Password))
-                            user.Password = HashPassword(Password);
 
                         context.SaveChanges();
 
@@ -302,89 +296,27 @@ namespace MunicipalEnterprise.ViewModels
 
         }
 
-        private void BtnClickUndoChangesCommand(object obj)
+        private async void UndoChanges(object obj)
         {
-            FirstName = _backupFirstName;
-            LastName = _backupLastName;
-            MiddleName = _backupMiddleName;
-            DateOfBirth = _backupDateOfBirth;
-            PhoneNum = _backupPhoneNum;
-            Email = _backupEmail;
-            Login = _backupLogin;
-            Password = _backupPassword;
+            FirstName = _backupUser.FirstName;
+            LastName = _backupUser.LastName;
+            MiddleName = _backupUser.MiddleName;
+            DateOfBirth = _backupUser.DateOfBirth;
+            PhoneNum = _backupUser.PhoneNum;
+            Email = _backupUser.Email;
+            Login = _backupUser.Login;
 
-            using (var context = _contextFactory.CreateDbContext())
+            await Task.Run(() =>
             {
-                var user = context.Users.Find(_userId);
-
-                user.FirstName = _backupFirstName;
-                user.LastName = _backupLastName;
-                user.MiddleName = _backupMiddleName;
-                user.DateOfBirth = _backupDateOfBirth;
-                user.PhoneNum = _backupPhoneNum;
-                user.Email = _backupEmail;
-                user.Login = _backupLogin;
-                user.Password = _backupPassword;
-
-                context.SaveChanges();
-            }
-        }
-
-        public string HashPassword(string s)
-        { 
-            byte[] bytes = Encoding.Unicode.GetBytes(s);
-
-            MD5CryptoServiceProvider CSP =
-                new MD5CryptoServiceProvider();
-
-            byte[] byteHash = CSP.ComputeHash(bytes);
-
-            string hash = string.Empty;
-
-            foreach (byte b in byteHash)
-                hash += string.Format("{0:x2}", b);
-
-            return hash;
-        }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            var userId = navigationContext.Parameters["userId"];
-            if (userId != null)
-                _userId = (int)userId;
-
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var user = context.Users.Find(_userId);
-                if (user != null)
+                using (var context = _contextFactory.CreateDbContext())
                 {
-                    FirstName = user.FirstName;
-                    LastName = user.LastName;
-                    MiddleName = user.MiddleName;
-                    DateOfBirth = user.DateOfBirth;
-                    PhoneNum = user.PhoneNum;
-                    Email = user.Email;
-                    Login = user.Login;
+                    var user = context.Users.Find(_authService.User.Id);
 
-                    _backupFirstName = user.FirstName;
-                    _backupLastName = user.LastName;
-                    _backupMiddleName = user.MiddleName;
-                    _backupDateOfBirth = user.DateOfBirth;
-                    _backupPhoneNum = user.PhoneNum;
-                    _backupEmail = user.Email;
-                    _backupLogin = user.Login;
-                    _backupPassword = user.Password;
+                    user = _backupUser;
+                    context.SaveChanges();
                 }
-            }
+            });
         }
 
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-        }
     }
 }

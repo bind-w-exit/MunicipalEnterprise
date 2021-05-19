@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Data.Models;
-using Prism.Regions;
+using MunicipalEnterprise.Extensions;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    class HousesViewModel : BaseViewModel, INavigationAware
+    class HousesViewModel : BaseViewModel
     {
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
-
-        private int _userId;
+        private readonly IAuthService _authService;
 
         private ObservableCollection<House> _housesList;
         public ObservableCollection<House> HousesList
@@ -25,31 +24,16 @@ namespace MunicipalEnterprise.ViewModels
 
         }
 
-        public HousesViewModel(IDbContextFactory<MyDbContext> contextFactory)
+        public HousesViewModel(IDbContextFactory<MyDbContext> contextFactory, IAuthService authService)
         {
             _contextFactory = contextFactory;
-        }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            var userId = navigationContext.Parameters["userId"];
-            if (userId != null)
-                _userId = (int)userId;
+            _authService = authService;
 
             using (var context = _contextFactory.CreateDbContext())
             {
-                context.Houses.Where(x => x.User.Id == _userId).Load();
+                context.Houses.Where(x => x.User == _authService.User).Load();
                 HousesList = context.Houses.Local.ToObservableCollection();
             }
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
         }
     }
 }

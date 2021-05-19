@@ -18,7 +18,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         
-        <TextBlock Text="{Binding DialogHeader}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+        <TextBlock Text="{Binding DialogTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
         
         <ComboBox ItemsSource="{Binding Districts}"
                   Grid.Row="1" Grid.Column="2"

@@ -119,7 +119,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
                     <Button Content="Delete complaint"    
-                    Command="{Binding BtnClickDeleteComplain}"
+                    Command="{Binding DeleteComplainCommand}"
                     Width="180"
                     Margin="0,0,50,0"                  
                     Style="{DynamicResource MaterialDesignRaisedButton}"/>
