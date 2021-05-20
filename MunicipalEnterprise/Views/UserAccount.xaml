@@ -49,7 +49,7 @@
                  Margin="0,0,30,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding FirstName}"
+                 Text="{Binding User.FirstName}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
         
         <TextBox materialDesign:HintAssist.Hint="Last Name"
@@ -60,7 +60,7 @@
                  Margin="0,0,30,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding LastName}"
+                 Text="{Binding User.LastName}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
         
         <TextBox materialDesign:HintAssist.Hint="Middle Name"
@@ -71,7 +71,7 @@
                  Margin="0,0,10,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding MiddleName}"
+                 Text="{Binding User.MiddleName}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
         
         <TextBox materialDesign:HintAssist.Hint="Phone number"
@@ -82,7 +82,7 @@
                  Margin="0,0,30,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding PhoneNum}"
+                 Text="{Binding User.PhoneNum}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
         <DatePicker materialDesign:HintAssist.Hint="Birthday"
@@ -93,7 +93,7 @@
                     VerticalAlignment="Bottom"
                     FontSize="14"
                     FontWeight="SemiBold"
-                    SelectedDate="{Binding DateOfBirth}"
+                    SelectedDate="{Binding User.DateOfBirth}"
                     materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
         <TextBox materialDesign:HintAssist.Hint="Login"
@@ -104,7 +104,7 @@
                  Margin="0,0,30,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding Login}"
+                 Text="{Binding User.Login}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
         <TextBox materialDesign:HintAssist.Hint="Email"
@@ -115,7 +115,7 @@
                  Margin="0,0,30,10"
                  FontSize="14"
                  FontWeight="SemiBold"
-                 Text="{Binding Email}"
+                 Text="{Binding User.Email}"
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
         <TextBox materialDesign:HintAssist.Hint="Access level"
@@ -127,7 +127,7 @@
                  FontSize="14"
                  FontWeight="SemiBold"
                  IsReadOnly="True"
-                 Text="{Binding AccessLevel}" 
+                 Text="{Binding User.AccessLevel}" 
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
 

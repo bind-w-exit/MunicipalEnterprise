@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Extensions;
 using MunicipalEnterprise.Views;
@@ -23,6 +24,15 @@ namespace MunicipalEnterprise
         /// </summary>
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            var mapperConfiguration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Data.Models.User, Models.UserVM>();
+                cfg.CreateMap<Models.UserVM, Data.Models.User>();
+                cfg.CreateMap<ViewModels.UserAccountViewModel, Models.UserVM>();
+            });
+
+            containerRegistry.RegisterInstance<IMapper>(mapperConfiguration.CreateMapper());
+
             containerRegistry.RegisterSingleton<IDbContextFactory<MyDbContext>, MyDbContextFactory>();
             containerRegistry.RegisterSingleton<IAuthService, AuthManager>();
 
@@ -34,5 +44,6 @@ namespace MunicipalEnterprise
             containerRegistry.RegisterForNavigation<Complaints>();
             containerRegistry.RegisterForNavigation<UserAccount>();
         }
+
     }
 }
