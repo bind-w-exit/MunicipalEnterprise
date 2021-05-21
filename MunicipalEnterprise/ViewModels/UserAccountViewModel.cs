@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
+using MunicipalEnterprise.Data.Models;
 using MunicipalEnterprise.Extensions;
 using MunicipalEnterprise.Models;
+using MunicipalEnterprise.Validators;
 using System.Threading.Tasks;
 
 namespace MunicipalEnterprise.ViewModels
@@ -12,6 +15,7 @@ namespace MunicipalEnterprise.ViewModels
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
+        private readonly IValidator<UserVM> _validator;
 
         private UserVM _backupUser;
         private UserVM _user;
@@ -20,11 +24,13 @@ namespace MunicipalEnterprise.ViewModels
         public DelegateCommand SaveChangesCommand { get; private set; }
         public DelegateCommand UndoChangesCommand { get; private set; }
 
+
         public UserAccountViewModel(IDbContextFactory<MyDbContext> contextFactory, IAuthService authService, IMapper mapper)
         {
             _contextFactory = contextFactory;
             _authService = authService;
             _mapper = mapper;
+            _validator = new UserValidator();
 
             User = _mapper.Map<Data.Models.User, UserVM>(_authService.User);
             _backupUser = _mapper.Map<Data.Models.User, UserVM>(_authService.User);
@@ -36,16 +42,30 @@ namespace MunicipalEnterprise.ViewModels
 
         private async void SaveChanges(object obj)
         {
-            _authService.User = _mapper.Map<UserVM, Data.Models.User>(User);
-            await Task.Run(() =>
+
+             
+            var validationResult = _validator.Validate(User);
+            if (validationResult.IsValid)
             {
-                using (var context = _contextFactory.CreateDbContext())
+                _authService.User = _mapper.Map<UserVM, Data.Models.User>(User);
+                await Task.Run(() =>
                 {
-                    var user = _mapper.Map<UserVM, Data.Models.User>(User);
-                    context.Update(user);
-                    context.SaveChanges();
+                    using (var context = _contextFactory.CreateDbContext())
+                    {
+                        var user = _mapper.Map<UserVM, Data.Models.User>(User);
+                        context.Update(user);
+                        context.SaveChanges();
+                    }
+                });
+            }
+            else
+            {
+                foreach (var failure in validationResult.Errors)
+                {
+                    AddError(failure.PropertyName, failure.ErrorMessage);
                 }
-            });
+            }
+
 
         }
 

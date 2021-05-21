@@ -7,9 +7,8 @@ using System.Linq;
 
 namespace MunicipalEnterprise.ViewModels
 {
-    public class BaseViewModel : BindableBase, INotifyDataErrorInfo
-    {        
-
+    public abstract class BaseViewModel : BindableBase, INotifyDataErrorInfo
+    {
         private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;

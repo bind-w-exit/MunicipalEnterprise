@@ -130,6 +130,18 @@
                  Text="{Binding User.AccessLevel}" 
                  materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
 
+        <TextBox materialDesign:HintAssist.Hint="Access level"
+                 Grid.Row="5"
+                 Grid.Column="2"
+                 Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
+                 VerticalAlignment="Bottom"              
+                 Margin="0,0,30,10"
+                 FontSize="14"
+                 FontWeight="SemiBold"
+                 IsReadOnly="True"
+                 Text="{Binding LastName}" 
+                 materialDesign:ValidationAssist.Background="{DynamicResource PrimaryHueLightBrush}"/>
+
 
         <StackPanel Grid.Column="1"
                     Grid.Row="6"
