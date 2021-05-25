@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using MunicipalEnterprise.Data;
-using MunicipalEnterprise.Data.Models;
 using MunicipalEnterprise.Extensions;
 using MunicipalEnterprise.Models;
-using MunicipalEnterprise.Validators;
 using System.Threading.Tasks;
 
 namespace MunicipalEnterprise.ViewModels
@@ -15,11 +12,10 @@ namespace MunicipalEnterprise.ViewModels
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
-        private readonly IValidator<UserVM> _validator;
 
         private UserVM _backupUser;
         private UserVM _user;
-        public UserVM User { get => _user; set => SetProperty(ref _user, value); }
+        public UserVM User { get => _user;set => SetProperty(ref _user, value); }
 
         public DelegateCommand SaveChangesCommand { get; private set; }
         public DelegateCommand UndoChangesCommand { get; private set; }
@@ -30,22 +26,17 @@ namespace MunicipalEnterprise.ViewModels
             _contextFactory = contextFactory;
             _authService = authService;
             _mapper = mapper;
-            _validator = new UserValidator();
 
             User = _mapper.Map<Data.Models.User, UserVM>(_authService.User);
             _backupUser = _mapper.Map<Data.Models.User, UserVM>(_authService.User);
 
             SaveChangesCommand = new DelegateCommand(SaveChanges);
             UndoChangesCommand = new DelegateCommand(UndoChanges);
-
-        }     
+        }
 
         private async void SaveChanges(object obj)
         {
-
-             
-            var validationResult = _validator.Validate(User);
-            if (validationResult.IsValid)
+            if (User.FullValidation())
             {
                 _authService.User = _mapper.Map<UserVM, Data.Models.User>(User);
                 await Task.Run(() =>
@@ -58,15 +49,6 @@ namespace MunicipalEnterprise.ViewModels
                     }
                 });
             }
-            else
-            {
-                foreach (var failure in validationResult.Errors)
-                {
-                    AddError(failure.PropertyName, failure.ErrorMessage);
-                }
-            }
-
-
         }
 
         private async void UndoChanges(object obj)

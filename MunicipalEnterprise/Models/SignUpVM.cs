@@ -1,20 +1,17 @@
-﻿using MunicipalEnterprise.Data.Models;
-using MunicipalEnterprise.Validators;
+﻿using MunicipalEnterprise.Validators;
 using System;
 using System.Linq;
 
 namespace MunicipalEnterprise.Models
 {
-    public class UserVM : ValidationBindableBase
+    public class SignUpVM : ValidationBindableBase
     {
-        private readonly UserValidator validator;
+        private readonly SignUpValidator validator;
 
-        public UserVM()
+        public SignUpVM()
         {
-            validator = new UserValidator();
+            validator = new();
         }
-
-        public int Id { get; set; }
 
         private string _firstName;
         public string FirstName
@@ -23,7 +20,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _firstName, value))
+                if(SetProperty(ref _firstName, value))
                 {
                     ClearErrors(nameof(FirstName));
                     var firstOrDefault = validator.Validate(this)
@@ -41,7 +38,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _lastName, value))
+                if(SetProperty(ref _lastName, value))
                 {
                     ClearErrors(nameof(LastName));
                     var firstOrDefault = validator.Validate(this)
@@ -59,7 +56,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _middleName, value))
+                if(SetProperty(ref _middleName, value))
                 {
                     ClearErrors(nameof(MiddleName));
                     var firstOrDefault = validator.Validate(this)
@@ -70,14 +67,14 @@ namespace MunicipalEnterprise.Models
             }
         }
 
-        private DateTime _dateOfBirth;
+        private DateTime _dateOfBirth = DateTime.Today;
         public DateTime DateOfBirth
         {
             get => _dateOfBirth;
 
             set
             {
-                if (SetProperty(ref _dateOfBirth, value))
+                if(SetProperty(ref _dateOfBirth, value))
                 {
                     ClearErrors(nameof(DateOfBirth));
                     var firstOrDefault = validator.Validate(this)
@@ -95,7 +92,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _phoneNum, value))
+                if(SetProperty(ref _phoneNum, value))
                 {
                     ClearErrors(nameof(PhoneNum));
                     var firstOrDefault = validator.Validate(this)
@@ -113,7 +110,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _email, value))
+                if(SetProperty(ref _email, value))
                 {
                     ClearErrors(nameof(Email));
                     var firstOrDefault = validator.Validate(this)
@@ -131,7 +128,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _login, value))
+                if(SetProperty(ref _login, value))
                 {
                     ClearErrors(nameof(Login));
                     var firstOrDefault = validator.Validate(this)
@@ -149,7 +146,7 @@ namespace MunicipalEnterprise.Models
 
             set
             {
-                if (SetProperty(ref _password, value))
+                if(SetProperty(ref _password, value))
                 {
                     ClearErrors(nameof(Password));
                     var firstOrDefault = validator.Validate(this)
@@ -159,9 +156,6 @@ namespace MunicipalEnterprise.Models
                 }
             }
         }
-
-        private Access _accessLevel;
-        public Access AccessLevel { get => _accessLevel; set => SetProperty(ref _accessLevel, value); }
 
         public bool FullValidation()
         {

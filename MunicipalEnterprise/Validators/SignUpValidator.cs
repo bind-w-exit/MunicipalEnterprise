@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace MunicipalEnterprise.Validators
 {
-    class UserValidator : AbstractValidator<UserVM>
+    class SignUpValidator : AbstractValidator<SignUpVM>
     {
         const string NullOrEmptyMessage = "Field cannot be empty";
         const string LettersOnlyMessage = "The field must contain only letters";
 
-        public UserValidator()
+        public SignUpValidator()
         {
             CascadeMode = CascadeMode.Stop;     //Terminates the chain of inspections when a particular validator in the chain fails.
 

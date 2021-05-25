@@ -35,7 +35,7 @@
                    FontFamily="Bahnschrift SemiBold SemiCondensed"/>
 
 
-            <ListView ItemsSource="{Binding PaymentsList}"
+            <ListView ItemsSource="{Binding Payments.Payments}"
                   Grid.Row="1">
 
 

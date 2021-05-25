@@ -2,6 +2,7 @@
 using MunicipalEnterprise.Data;
 using MunicipalEnterprise.Data.Models;
 using MunicipalEnterprise.Extensions;
+using MunicipalEnterprise.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,70 +14,8 @@ namespace MunicipalEnterprise.ViewModels
         private readonly IDbContextFactory<MyDbContext> _contextFactory;
         private readonly IAuthService _authService;
 
-        private ObservableCollection<Complaint> _complaintsList;
-        public ObservableCollection<Complaint> ComplaintsList
-        {
-            get
-            {
-                return _complaintsList;
-            }
-
-            set { SetProperty(ref _complaintsList, value); }
-
-        }
-
-        private Complaint _selectedComplaint;
-        public Complaint SelectedComplaint
-        {
-            get
-            {
-                return _selectedComplaint;
-            }
-
-            set { SetProperty(ref _selectedComplaint, value); }
-        }
-
-        private ObservableCollection<District> _districts;
-        public ObservableCollection<District> Districts
-        {
-            get
-            {
-                return _districts;
-            }
-
-            set { SetProperty(ref _districts, value); }
-
-        }
-
-        private District _selectedDistrict;
-        public District SelectedDistrict
-        {
-            get
-            {
-                return _selectedDistrict;
-            }
-
-            set
-            {
-                SetProperty(ref _selectedDistrict, value);
-                ClearErrors(nameof(SelectedDistrict));
-            }
-        }
-
-        private string _briefDescription;
-        public string BriefDescription
-        {
-            get
-            {
-                return _briefDescription;
-            }
-
-            set
-            {
-                SetProperty(ref _briefDescription, value);
-                ClearErrors(nameof(BriefDescription));
-            }
-        }
+        private ComplaintVM _complaint;
+        public ComplaintVM Complaint { get => _complaint; set => SetProperty(ref _complaint, value); }
 
         public DelegateCommand DeleteComplainCommand { get; private set; }
 
@@ -84,6 +23,8 @@ namespace MunicipalEnterprise.ViewModels
         {
             _contextFactory = contextFactory;
             _authService = authService;
+
+            _complaint = new();
 
             OpenEditDialogCommand = new DelegateCommand(OpenEditDialog);
             OpenAddDialogCommand = new DelegateCommand(OpenAddDialog);
@@ -93,8 +34,8 @@ namespace MunicipalEnterprise.ViewModels
 
             using (var context = _contextFactory.CreateDbContext())
             {
-                ComplaintsList = new ObservableCollection<Complaint>(context.Complaints.Where(x => x.User == _authService.User));
-                Districts = new ObservableCollection<District>(context.Districts);
+                Complaint.ComplaintsList = new ObservableCollection<Complaint>(context.Complaints.Where(x => x.User == _authService.User));
+                Complaint.Districts = new ObservableCollection<District>(context.Districts);
             }
         }       
 
@@ -102,10 +43,10 @@ namespace MunicipalEnterprise.ViewModels
         {                      
             using (var context = _contextFactory.CreateDbContext())
             {
-                context.Remove(SelectedComplaint);
+                context.Remove(Complaint.SelectedComplaint);
                 context.SaveChanges();
             }
-            ComplaintsList.Remove(SelectedComplaint);
+            Complaint.ComplaintsList.Remove(Complaint.SelectedComplaint);
         }
 
         #region DialogWindow
@@ -159,20 +100,20 @@ namespace MunicipalEnterprise.ViewModels
         {
             DialogContent = new ComplaintsDialog();
             DialogTitle = "Add complaint";
-            BriefDescription = "";
-            SelectedDistrict = Districts.FirstOrDefault();
+            Complaint.BriefDescription = "";
+            Complaint.SelectedDistrict = Complaint.Districts.FirstOrDefault();
             IsAddDialog = true;
             IsDialogOpen = true;          
         }
 
         private void OpenEditDialog(object obj)
         {
-            if (SelectedComplaint != null)
+            if (Complaint.SelectedComplaint != null)
             {
                 DialogContent = new ComplaintsDialog();
                 DialogTitle = "Editing complaint";
-                BriefDescription = SelectedComplaint.Description;
-                SelectedDistrict = Districts.FirstOrDefault();
+                Complaint.BriefDescription = Complaint.SelectedComplaint.Description;
+                Complaint.SelectedDistrict = Complaint.Districts.FirstOrDefault();
                 IsAddDialog = false;
                 IsDialogOpen = true;               
             }
@@ -182,15 +123,7 @@ namespace MunicipalEnterprise.ViewModels
 
         private void AcceptDialog(object obj)
         {
-            if (string.IsNullOrEmpty(BriefDescription))
-            {
-                AddError(nameof(BriefDescription), "Field cannot be empty");
-            }
-            if (SelectedDistrict == null)
-            {
-                AddError(nameof(SelectedDistrict), "Field cannot be empty");
-            }
-            if (!HasErrors)
+            if (Complaint.FullValidation())
             {
 
                 using (var context = _contextFactory.CreateDbContext())
@@ -198,26 +131,25 @@ namespace MunicipalEnterprise.ViewModels
                     var complain = new Complaint
                     {
                         Date = DateTime.Now,
-                        Description = BriefDescription,
+                        Description = Complaint.BriefDescription,
                         Status = "Not"
                     };
 
                     complain.User = context.Users.Find(_authService.User.Id);
-                    complain.District = context.Districts.Find(SelectedDistrict.Id);
+                    complain.District = context.Districts.Find(Complaint.SelectedDistrict.Id);
 
                     if (IsAddDialog)
                     {                       
                         context.Add(complain);
                         context.SaveChanges();
-                        ComplaintsList.Add(complain);
+                        Complaint.ComplaintsList.Add(complain);
                     }
                     else
                     {
-                        context.Remove(SelectedComplaint);      //TODO FIX THIS!!!
-                        context.Add(complain);
+                        context.Update(Complaint.SelectedComplaint);      //TODO FIX THIS!!!
                         context.SaveChanges();
-                        ComplaintsList.Remove(SelectedComplaint);
-                        ComplaintsList.Add(complain);
+                        Complaint.ComplaintsList.Remove(Complaint.SelectedComplaint);
+                        Complaint.ComplaintsList.Add(complain);
                     }
 
                     IsDialogOpen = false;

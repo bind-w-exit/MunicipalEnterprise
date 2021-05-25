@@ -1,4 +1,5 @@
 ﻿using MunicipalEnterprise.Extensions;
+using MunicipalEnterprise.Models;
 using Prism.Regions;
 using System.Threading.Tasks;
 
@@ -9,28 +10,8 @@ namespace MunicipalEnterprise.ViewModels
         private readonly IRegionManager _regionManager;
         private readonly IAuthService _authService;
 
-        private string _login;
-        public string Login
-        {
-            get { return _login; }
-            set
-            {
-                SetProperty(ref _login, value);
-                ClearErrors(nameof(Login));
-            }
-        }
-
-        public string _password;
-        public string Password
-        {
-            get { return _password; }
-            set
-            {
-                SetProperty(ref _password, value);
-                ClearErrors(nameof(Password));
-                ClearErrors(nameof(Login));
-            }
-        }
+        private SignInVM _signIn;
+        public SignInVM SignIn { get => _signIn; set => SetProperty(ref _signIn, value); }
 
         public DelegateCommand LoginCommand { get; private set; }
 
@@ -39,21 +20,18 @@ namespace MunicipalEnterprise.ViewModels
             _regionManager = regionManager;
             _authService = authService;
 
+            _signIn = new();
+
             LoginCommand = new DelegateCommand(LoginUser);
         }
 
-        private async void LoginUser(object obj)
+        private void LoginUser(object obj)
         {
-            await Task.Run(() =>
+            if(SignIn.FullValidation())
             {
-                if (!_authService.Login(Login, Password))
-                    AddError(nameof(Login), "Wrong login or password");
-                
-            });
-
-            if (!HasErrors)
-            {
-                _regionManager.RequestNavigate("MainRegion", "User");
+                if (_authService.Login(SignIn.Login, SignIn.Password))
+                    _regionManager.RequestNavigate("MainRegion", "User");
+                else SignIn.WrongLoginOrPassword(); //TODO Add error "Wrong login or password"
             }
         }
     }

@@ -19,12 +19,12 @@
         </Grid.RowDefinitions>
         
         <TextBlock Text="{Binding DialogTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
-        
-        <ComboBox ItemsSource="{Binding Districts}"
+
+        <ComboBox ItemsSource="{Binding Complaint.Districts}"
                   Grid.Row="1" Grid.Column="2"
                   Style="{DynamicResource MaterialDesignFloatingHintComboBox}"
                   FontSize="14" FontWeight="SemiBold"
-                  SelectedItem="{Binding SelectedDistrict}"
+                  SelectedItem="{Binding Complaint.SelectedDistrict}"
                   materialDesign:HintAssist.Hint="District">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -35,7 +35,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <TextBox materialDesign:HintAssist.Hint="Brief description"
-                 Text="{Binding BriefDescription}"  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                 Text="{Binding Complaint.BriefDescription}"  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
                  Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextWrapping="Wrap" VerticalAlignment="Top"
                  Margin="0,10,0,10"  FontSize="14" FontWeight="SemiBold" VerticalScrollBarVisibility="Visible"/>
 

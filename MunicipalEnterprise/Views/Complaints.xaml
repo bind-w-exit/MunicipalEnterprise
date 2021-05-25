@@ -44,9 +44,9 @@
 
             </Grid>
 
-            <ListView ItemsSource="{Binding ComplaintsList}"
+            <ListView ItemsSource="{Binding Complaint.ComplaintsList}"
                   Grid.Row="1"
-                  SelectedItem="{Binding SelectedComplaint}">
+                  SelectedItem="{Binding Complaint.SelectedComplaint}">
 
                 <ListView.View>
 

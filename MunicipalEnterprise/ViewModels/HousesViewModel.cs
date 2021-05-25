@@ -13,16 +13,7 @@ namespace MunicipalEnterprise.ViewModels
         private readonly IAuthService _authService;
 
         private ObservableCollection<House> _housesList;
-        public ObservableCollection<House> HousesList
-        {
-            get
-            {
-                return _housesList;
-            }
-
-            set { SetProperty(ref _housesList, value); }
-
-        }
+        public ObservableCollection<House> HousesList { get => _housesList; set => SetProperty(ref _housesList, value); }
 
         public HousesViewModel(IDbContextFactory<MyDbContext> contextFactory, IAuthService authService)
         {
@@ -31,8 +22,7 @@ namespace MunicipalEnterprise.ViewModels
 
             using (var context = _contextFactory.CreateDbContext())
             {
-                context.Houses.Where(x => x.User == _authService.User).Load();
-                HousesList = context.Houses.Local.ToObservableCollection();
+                HousesList = new ObservableCollection<House>(context.Houses.Where(x => x.User == _authService.User));
             }
         }
     }

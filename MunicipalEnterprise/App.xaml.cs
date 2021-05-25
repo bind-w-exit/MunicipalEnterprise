@@ -28,6 +28,8 @@ namespace MunicipalEnterprise
             {
                 cfg.CreateMap<Data.Models.User, Models.UserVM>();
                 cfg.CreateMap<Models.UserVM, Data.Models.User>();
+                cfg.CreateMap<Data.Models.User, Models.SignUpVM>();
+                cfg.CreateMap<Models.SignUpVM, Data.Models.User>();
             });
 
             containerRegistry.RegisterInstance<IMapper>(mapperConfiguration.CreateMapper());
